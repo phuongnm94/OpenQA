@@ -1,0 +1,50 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "run-server",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/server.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "run-test-qa",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/document_reader.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "run-predict-squadv2",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/libs/transformers/examples/pytorch/question-answering/run_qa_beam_search.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--model_name_or_path", "./finetuned_models/squad-2.0/wwm_cased_finetuned_squad/",
+                "--dataset_name", "squad_v2",
+                "--version_2_with_negative", "True",
+                "--max_seq_length", "384",
+                "--doc_stride", "128",
+                "--output_dir", "./finetuned_models/squad-2.0/wwm_cased_finetuned_squad/outdebug/",
+                "--do_eval",
+                // "--do_predict",
+            ],
+            "justMyCode": true
+        }
+    ]
+}

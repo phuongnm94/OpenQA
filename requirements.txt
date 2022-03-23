@@ -1,0 +1,16 @@
+
+# pip3 install torch==1.10.2+cu113 torchvision==0.11.3+cu113 torchaudio==0.10.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+transformers#4.17.0
+wikipedia#1.4.0
+tensorboardX
+tensorboard
+sentencepiece
+protobuf
+flask
+datasets
+seqeval
+apache_beam
+
+# conda install -c conda-forge openjdk=11
+# pip install pyserini
+# conda install faiss-cpu -c pytorch
