@@ -68,7 +68,7 @@ def __init_model():
     global qa_engine 
     # qa_engine = WikiQA(model_name_or_path='vasudevgupta/bigbird-roberta-natural-questions')
     # qa_engine = WikiQA('finetuned_models/squad-2.0/robertabase', using_kw_extract=True)
-    qa_engine = WikiQALucene(use_msmarco=True, model_name_or_path='finetuned_models/squad-2.0/robertabase_bak')
+    qa_engine = WikiQALucene(use_msmarco=True)
     # qa_engine = WikiQALucene(use_wiki=True, use_msmarco=False, model_name_or_path='finetuned_models/squad-2.0/robertabase_bak')
      
 
