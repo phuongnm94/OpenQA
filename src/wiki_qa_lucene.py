@@ -4,6 +4,7 @@ from document_reader import DocumentReader
 from pyserini.search.lucene import LuceneSearcher
 from pyserini.search.faiss import FaissSearcher, TctColBertQueryEncoder, DprQueryEncoder
 from pyserini.search.hybrid import HybridSearcher
+from utils_qa import _norm_text_ascii
 
 from wiki_qa import WikiQA
 import json
@@ -46,14 +47,14 @@ class WikiQALucene(WikiQA):
         I was born on 1 Jan 2022 at JAIST. I was born to support human search information on the Wikipedia Knowledge Base. Researchers at JAIST created me with their love. I can support human search information on the Wikipedia Knowledge Base.  I love you. 
         """
         for question in questions:
-            question = self.__text_norm(question)
+            question = self.text_norm(question)
 
             # simple preprocess question
             if not question.strip().endswith("?"):
                 for check_wh_question in ["what", "when", "where", "why", "how", "who", "which"]:
                     if check_wh_question in question.lower():
                         question = question.strip() + "?"
-            logger.info(f"Question: {question}")
+            logger.info(f"Question: {_norm_text_ascii(question)}")
 
             # wiki search page
             results = self.hsearcher.search(question,  k=15)
@@ -63,7 +64,7 @@ class WikiQALucene(WikiQA):
                 try:
                     doc = self.ssearcher.doc(result.docid)
                     json_doc = json.loads(doc.raw()).get('contents', '').encode('ascii', 'ignore').decode('ascii')
-                    logger.info(f"Add wiki page: {result.docid}: {json_doc[:40]}")
+                    logger.info(f"Add wiki page: {result.docid}: {_norm_text_ascii(json_doc[:40])}")
 
                     text = text + "\n\n\n" +  json_doc
                 except Exception as e:
@@ -85,7 +86,7 @@ class WikiQALucene(WikiQA):
             context_found = (detail_result[0]['context'].replace(
                 "<pad>", "").replace("[PAD]", "")).encode('utf-8').strip()
             logger.info(f"=======\n")
-            logger.info(f"=======\nAnswer: {answer}")
+            logger.info(f"=======\nAnswer: {_norm_text_ascii(answer)}")
             logger.info(f"=======\nConfidence: {detail_result[0]['prob']}")
             logger.info(f"=======\nContext: {context_found}")
             logger.info(f"=======\n")

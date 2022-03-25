@@ -408,7 +408,7 @@ if __name__ == "__main__":
     reader = DocumentReader(
         "finetuned_models/squad-2.0/wwm_cased_finetuned_squad", xlnet_model=True)
 
-    reader.tokenize_optimiz(question, context, max_toks=200)
-    results_reader = reader.get_answer_optimiz()
+    reader.tokenize(question, context, max_toks=500)
+    results_reader = reader.get_answer()
     import json
     print(json.dumps(results_reader[1], indent=2))

@@ -1,4 +1,5 @@
 from wiki_qa import WikiQA
+from wiki_qa_lucene import WikiQALucene
 
 if __name__ == "__main__":
     """
@@ -34,5 +35,5 @@ if __name__ == "__main__":
     ]
 
 
-    wikiqa = WikiQA()
-    wikiqa.answer(questions)
+    wikiqa = WikiQALucene()
+    wikiqa.answer(questions[:1])

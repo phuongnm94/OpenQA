@@ -28,7 +28,7 @@ class WikiQA:
         pass
 
     @staticmethod
-    def __text_norm(str_in):
+    def text_norm(str_in):
         return re.sub(r' {2,}', ' ',  str_in.strip())
         
     def answer(self, questions):
@@ -38,14 +38,14 @@ class WikiQA:
         I was born on 1 Jan 2022 at JAIST. I was born to support human search information on the Wikipedia Knowledge Base. Researchers at JAIST created me with their love. I can support human search information on the Wikipedia Knowledge Base.  I love you. 
         """
         for question in questions:
-            question = self.__text_norm(question)
+            question = self.text_norm(question)
 
             # simple preprocess question
             if not question.strip().endswith("?"):
                 for check_wh_question in ["what", "when", "where", "why", "how", "who", "which"]:
                     if check_wh_question in question.lower():
                         question = question.strip() + "?"
-            logger.info(f"Question: {question}")
+            logger.info(f"Question: {_norm_text_ascii(question)}")
 
             # wiki search page
             results_wiki_by_kw = []
@@ -79,7 +79,7 @@ class WikiQA:
             answer, detail_result = self.reader.get_answer()
 
             if len(answer.strip()) == 0 or "<s>" in answer.lower():
-                answer = "Sorry, I do not find the information to answer of this question."
+                answer = "Sorry, I don't find the information to answer this question."
 
             if len(detail_result) == 0:
                 continue
