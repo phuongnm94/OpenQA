@@ -27,14 +27,17 @@ class WikiQALucene(WikiQA):
                 encoder
             )
             self.hsearcher = HybridSearcher(dsearcher, self.ssearcher)
+            # self.hsearcher = self.ssearcher
+
         elif use_wiki:
             self.ssearcher = LuceneSearcher.from_prebuilt_index('wikipedia-dpr') #facebook-dpr-question_encoder-single-nq-base
-            encoder = DprQueryEncoder('facebook/dpr-question_encoder-multiset-base')
+            encoder = DprQueryEncoder('facebook/dpr-ctx_encoder-single-nq-base')
             dsearcher = FaissSearcher.from_prebuilt_index(
                 'wikipedia-dpr-multi-bf',
                 encoder
             )
             self.hsearcher = HybridSearcher(dsearcher, self.ssearcher)
+            # self.hsearcher = self.ssearcher
 
     def answer(self, questions):
         results_reader = [""]
@@ -43,28 +46,36 @@ class WikiQALucene(WikiQA):
         I was born on 1 Jan 2022 at JAIST. I was born to support human search information on the Wikipedia Knowledge Base. Researchers at JAIST created me with their love. I can support human search information on the Wikipedia Knowledge Base.  I love you. 
         """
         for question in questions:
+            question = self.__text_norm(question)
+
             # simple preprocess question
+            if not question.strip().endswith("?"):
+                for check_wh_question in ["what", "when", "where", "why", "how", "who", "which"]:
+                    if check_wh_question in question.lower():
+                        question = question.strip() + "?"
             logger.info(f"Question: {question}")
 
             # wiki search page
-            results = self.hsearcher.search(question)
+            results = self.hsearcher.search(question,  k=15)
              
             text = ''
             for result in results[:15]:
                 try:
                     doc = self.ssearcher.doc(result.docid)
-                    json_doc = json.loads(doc.raw()).get('contents', '')
-                    logger.info(f"Add wiki page: {result.docid}: {json_doc[:10]}")
+                    json_doc = json.loads(doc.raw()).get('contents', '').encode('ascii', 'ignore').decode('ascii')
+                    logger.info(f"Add wiki page: {result.docid}: {json_doc[:40]}")
 
                     text = text + "\n\n\n" +  json_doc
-                except Exception:
+                except Exception as e:
+                    logger.info(e)
                     logger.info(
-                        "Can not get page {} from wiki DB".format(result))
+                        "Can not get page {} from External DB".format(result))
 
             # ranking and generate answer by ML model
-            self.reader.tokenize(question, text, intro_context=intro_context, max_toks=200)
+            self.reader.tokenize(question, text, intro_context=intro_context, max_toks=500)
             answer, detail_result = self.reader.get_answer()
 
+            logger.info(f'len(detail_result) = {len(detail_result)}')
             if len(answer.strip()) == 0 or "<s>" in answer.lower():
                 answer = "Sorry, I do not find the information to answer of this question."
 

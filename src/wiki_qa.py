@@ -4,6 +4,8 @@ import re
 from document_reader import DocumentReader
 from keybert import KeyBERT
 
+from utils_qa import _norm_text_ascii
+
 logger = logging.getLogger(__name__)
 
 
@@ -25,6 +27,10 @@ class WikiQA:
         # self.reader = DocumentReader("deepset/xlm-roberta-base-squad2")
         pass
 
+    @staticmethod
+    def __text_norm(str_in):
+        return re.sub(r' {2,}', ' ',  str_in.strip())
+        
     def answer(self, questions):
         results_reader = [""]
         intro_context = """
@@ -32,6 +38,8 @@ class WikiQA:
         I was born on 1 Jan 2022 at JAIST. I was born to support human search information on the Wikipedia Knowledge Base. Researchers at JAIST created me with their love. I can support human search information on the Wikipedia Knowledge Base.  I love you. 
         """
         for question in questions:
+            question = self.__text_norm(question)
+
             # simple preprocess question
             if not question.strip().endswith("?"):
                 for check_wh_question in ["what", "when", "where", "why", "how", "who", "which"]:
@@ -59,8 +67,8 @@ class WikiQA:
             for result in set(results_wiki + results_wiki_by_kw):
                 try:
                     page = wiki.page(result)
-                    logger.info(f"Add wiki page: {result}")
-                    paras = re.split(r'\n\n+', page.content)
+                    logger.info(f"Add wiki page: {_norm_text_ascii(result)}")
+                    paras = re.split(r'\n\n+', _norm_text_ascii(page.content))
                     text = text + "\n\n\n" + "\n\n".join(paras[:10])
                 except Exception:
                     logger.info(
@@ -79,7 +87,7 @@ class WikiQA:
             context_found = (detail_result[0]['context'].replace(
                 "<pad>", "").replace("[PAD]", "")).encode('utf-8').strip()
             logger.info(f"=======\n")
-            logger.info(f"=======\nAnswer: {answer}")
+            logger.info(f"=======\nAnswer: {_norm_text_ascii(answer)}")
             logger.info(f"=======\nConfidence: {detail_result[0]['prob']}")
             logger.info(f"=======\nContext: {context_found}")
             logger.info(f"=======\n")

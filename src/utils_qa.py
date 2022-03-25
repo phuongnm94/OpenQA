@@ -27,6 +27,8 @@ from tqdm.auto import tqdm
 
 logger = logging.getLogger(__name__)
 
+def _norm_text_ascii(text_in):
+    return text_in.encode('ascii', 'ignore').decode('ascii')
 
 def postprocess_qa_predictions(
     examples,
