@@ -49,6 +49,13 @@ class WikiQALucene(WikiQA):
         for question in questions:
             question = self.text_norm(question)
 
+            # check the caced question 
+            question_or_ans = self.refine_question_by_cached(question)
+            if isinstance(question_or_ans, tuple):
+                return question_or_ans
+            else:
+                question = question_or_ans
+
             # simple preprocess question
             if not question.strip().endswith("?"):
                 for check_wh_question in ["what", "when", "where", "why", "how", "who", "which"]:
