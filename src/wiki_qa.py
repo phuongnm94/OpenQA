@@ -45,17 +45,30 @@ class WikiQA:
             return True
         return False
 
+    def combine_caced_question(self, question): 
+        cached_q = self.text_norm(self.cached_q)
+        q = self.text_norm(question)
+        cached_q_words = cached_q.split(" ")
+        delete_idx = -1
+        for i, _ in enumerate(cached_q_words):
+            if " ".join(cached_q_words[i:]) in q:
+                delete_idx = i
+                break
+        if delete_idx != -1:
+            cached_q = " ".join(cached_q_words[:delete_idx])
+        return cached_q + " " + q
+
     def refine_question_by_cached(self, question):
         if self.cached_q_flag:
             # check noun phrase
             noun_phrase_exist = self.check_noun_phrase_exist(question)
             if not noun_phrase_exist:
-                self.cached_q = self.cached_q + " " + question
+                self.cached_q = self.combine_caced_question(question)
                 answer = "I am waiting for you finish full question."
                 return answer, []
             else:
                 if len(self.cached_q) > 0:
-                    question = self.cached_q + " " + question
+                    question = self.combine_caced_question(question)
                 self.cached_q = ''
         return question
 
